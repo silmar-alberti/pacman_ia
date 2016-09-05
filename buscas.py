@@ -32,7 +32,7 @@ def busca_largura(problema ,profundidade,estado,caminho,visitados,fronteira):
         else:
             return None
 
-def profundidade(problem):
+def largura(problem):
 
     estado_incial = problem.getStartState()
     caminho = []

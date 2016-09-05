@@ -32,7 +32,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
-import Profundidade
+import buscas
 import sys
 import copy
 
@@ -105,7 +105,7 @@ def breadthFirstSearch(problem):
     You are not required to implement this, but you may find it useful for Q5.
     """
     "*** YOUR CODE HERE ***"
-    return  Profundidade.profundidade(problem)
+    return  Profundidade.largura(problem)
 
 def nullHeuristic(state, problem=None):
     """
@@ -142,31 +142,7 @@ def busca_profundidade(problema ,profundidade,estado,caminho,visitados,fronteira
         else:
             return None
 
-#
-def BPLRecursive(node, problem, limit, solution, v):
-    if not v.has_key(node):
-        v[node] = limit
-    if problem.goalTest(node):
-        return True
-    elif limit == 0:
-        return 0
-    else:
-        cut = False
-        for action in problem.getActions(node):
-            child = problem.getResult(node, action)
-            if not v.has_key(child):
-                resultado = BPLRecursive(child, problem, limit - 1, solution, v)
-                if resultado == 0:
-                    cut = True
-                elif resultado != None:
-                    solution.push(action)
-                    return True
-        if cut:
-            return 0
-        else:
-            return None
 
-#
 
 def iterativeDeepeningSearch(problem):
     """
@@ -179,9 +155,6 @@ def iterativeDeepeningSearch(problem):
     caminho = util.Queue()
 
     limite = 1
-    # fronteira =[]
-    # fronteira= set()
-
     visitados = util.Fronteira()
     visitados.add(estado,0)
     while True:
@@ -193,10 +166,10 @@ def iterativeDeepeningSearch(problem):
     return caminho.list
 
 
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
 # Abbreviations
 bfs = breadthFirstSearch
