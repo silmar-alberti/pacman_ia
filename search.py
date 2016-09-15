@@ -32,7 +32,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
-import buscas
+import Busca
 import sys
 import copy
 
@@ -105,7 +105,7 @@ def breadthFirstSearch(problem):
     You are not required to implement this, but you may find it useful for Q5.
     """
     "*** YOUR CODE HERE ***"
-    return  Profundidade.largura(problem)
+    return  Busca.largura(problem)
 
 def nullHeuristic(state, problem=None):
     """
@@ -142,8 +142,6 @@ def busca_profundidade(problema ,profundidade,estado,caminho,visitados,fronteira
         else:
             return None
 
-
-
 def iterativeDeepeningSearch(problem):
     """
     Perform DFS with increasingly larger depth.
@@ -155,6 +153,9 @@ def iterativeDeepeningSearch(problem):
     caminho = util.Queue()
 
     limite = 1
+    # fronteira =[]
+    # fronteira= set()
+
     visitados = util.Fronteira()
     visitados.add(estado,0)
     while True:
@@ -165,11 +166,12 @@ def iterativeDeepeningSearch(problem):
 
     return caminho.list
 
-
-
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
+    caminho = Busca.estrela(problem,heuristic)
     "*** YOUR CODE HERE ***"
+    # util.raiseNotDefined()
+    return caminho
 
 # Abbreviations
 bfs = breadthFirstSearch

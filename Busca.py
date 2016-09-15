@@ -51,3 +51,41 @@ def largura(problem):
                 break
 
     return caminho
+
+def busca_estrela(problema ,estado,caminho,visitados,fronteira,heuristica):
+    if estado not in visitados:
+        visitados.add(estado)
+
+    if problema.goalTest(estado):
+        return 1
+    else:
+        acoes = problema.getActions(estado)
+        for acao in acoes:
+            estado_filho = problema.getResult(estado,acao)
+            custo = problema.getCost(estado,acao)
+            custo += heuristica(estado,acao)
+            fronteira.push((estado_filho, caminho+[acao]),custo)
+        return 0
+
+
+
+def estrela(problem,heuristic):
+
+    estado_incial = problem.getStartState()
+    caminho = []
+
+    fila = util.PriorityQueue()
+
+    fila.push((estado_incial,[]),0)
+
+    custo = 0
+    visitados = set()
+    while True:
+        if not fila.isEmpty():
+            (estado ,caminho) = fila.pop()
+            resultado = busca_estrela(problem ,estado,caminho,visitados,fila,heuristic)
+            if resultado == 1:
+                break
+            custo += 1
+
+    return caminho
