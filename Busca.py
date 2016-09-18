@@ -67,13 +67,10 @@ def busca_estrela(problema ,custo,estado,caminho,visitados,fronteira,heuristica)
             estado_filho = problema.getResult(estado,acao)
 
             if  estado_filho not in visitados :
-                custo_filho = custo
-                try:
-                    custo_filho = custo + problema.getCost(estado_filho,acao)
-                except:
-                    pass
-                custo_filho += heuristica(estado_filho,problema)
-                fronteira.push((estado_filho, caminho+[acao],custo_filho),custo_filho)
+                custo_filho = custo + problema.getCost(estado,acao)
+
+                heuristica_filho = heuristica(estado_filho,problema)
+                fronteira.push((estado_filho, caminho+[acao],custo_filho),custo_filho+heuristica_filho)
 
 
         return 0
