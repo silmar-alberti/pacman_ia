@@ -52,19 +52,30 @@ def largura(problem):
 
     return caminho
 
-def busca_estrela(problema ,estado,caminho,visitados,fronteira,heuristica):
-    if estado not in visitados:
-        visitados.add(estado)
-
+def busca_estrela(problema ,custo,estado,caminho,visitados,fronteira,heuristica):
     if problema.goalTest(estado):
         return 1
     else:
+        if estado in visitados:
+            return 0
+        visitados.add(estado)
+
         acoes = problema.getActions(estado)
+
+
         for acao in acoes:
             estado_filho = problema.getResult(estado,acao)
-            custo = problema.getCost(estado,acao)
-            custo += heuristica(estado,acao)
-            fronteira.push((estado_filho, caminho+[acao]),custo)
+
+            if  estado_filho not in visitados :
+                custo_filho = custo
+                try:
+                    custo_filho = custo + problema.getCost(estado_filho,acao)
+                except:
+                    pass
+                custo_filho += heuristica(estado_filho,problema)
+                fronteira.push((estado_filho, caminho+[acao],custo_filho),custo_filho)
+
+
         return 0
 
 
@@ -72,20 +83,20 @@ def busca_estrela(problema ,estado,caminho,visitados,fronteira,heuristica):
 def estrela(problem,heuristic):
 
     estado_incial = problem.getStartState()
-    caminho = []
 
     fila = util.PriorityQueue()
 
-    fila.push((estado_incial,[]),0)
+    fila.push((estado_incial,[],0),0)
 
-    custo = 0
     visitados = set()
+    # visitados.add(estado_incial)
+
     while True:
         if not fila.isEmpty():
-            (estado ,caminho) = fila.pop()
-            resultado = busca_estrela(problem ,estado,caminho,visitados,fila,heuristic)
+            (estado ,caminho,custo) = fila.pop()
+            resultado = busca_estrela(problem,custo ,estado,caminho,visitados,fila,heuristic)
             if resultado == 1:
                 break
-            custo += 1
+
 
     return caminho
