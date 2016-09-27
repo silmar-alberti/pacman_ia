@@ -295,6 +295,7 @@ class CornersProblem(search.SearchProblem):
             if not startingGameState.hasFood(*corner):
                 print 'Warning: no food in corner ' + str(corner)
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
+        self.food =()
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
@@ -304,15 +305,23 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.state_food(self.startingPosition)
+        # "*** YOUR CODE HERE ***"
+        # util.raiseNotDefined()
 
     def goalTest(self, state):
-        """
-        Returns whether this search state is a goal state of the problem.
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        state,_ = state
+
+        if state not in self.food and state in self.corners:
+            self.food = state
+        if (len(self.corners)== len(self.food)):
+            return True
+
+        # """
+        # Returns whether this search state is a goal state of the problem.
+        # """
+        # "*** YOUR CODE HERE ***"
+        # util.raiseNotDefined()
 
     def getActions(self, state):
         """
@@ -322,7 +331,7 @@ class CornersProblem(search.SearchProblem):
         actions = []
         self._expanded += 1 # DO NOT CHANGE
         for direction in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            x,y = state[0]
+            (x,y),_ = state
             dx, dy = Actions.directionToVector(direction)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
@@ -344,6 +353,16 @@ class CornersProblem(search.SearchProblem):
 
         "*** YOUR CODE HERE ***"
 
+        (x, y ),_ = state
+        dx, dy = Actions.directionToVector(action)
+        nextx, nexty = int(x + dx), int(y + dy)
+        if (not self.walls[nextx][nexty]) and (not self.walls[nextx][nexty]):
+            nextState = (nextx, nexty)
+            return self.state_food(nextState)
+        else:
+            warnings.warn("Warning: checking the result of an invalid state, action pair.")
+            return state
+
     def getCost(self, state, action):
         """Given a state and an action, returns a cost of 1, which is
         the incremental cost of expanding to that successor."""
@@ -351,6 +370,10 @@ class CornersProblem(search.SearchProblem):
         if nextState != state:
             return 1
         return 0
+
+    def state_food(self,state):
+        retorno = (state , self.food)
+        return retorno
 
     def getCostOfActions(self, actions):
         """
