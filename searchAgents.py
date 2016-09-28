@@ -295,7 +295,7 @@ class CornersProblem(search.SearchProblem):
             if not startingGameState.hasFood(*corner):
                 print 'Warning: no food in corner ' + str(corner)
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
-        self.food =()
+        self.food = ()
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
@@ -305,16 +305,14 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        return self.state_food(self.startingPosition)
+        return self.state_food(self.startingPosition,())
         # "*** YOUR CODE HERE ***"
         # util.raiseNotDefined()
 
     def goalTest(self, state):
-        state,_ = state
+        state,eats = state
 
-        if state not in self.food and state in self.corners:
-            self.food = state
-        if (len(self.corners)== len(self.food)):
+        if (len(self.corners) == len(eats)):
             return True
 
         # """
@@ -353,12 +351,12 @@ class CornersProblem(search.SearchProblem):
 
         "*** YOUR CODE HERE ***"
 
-        (x, y ),_ = state
+        (x, y ),eats = state
         dx, dy = Actions.directionToVector(action)
         nextx, nexty = int(x + dx), int(y + dy)
         if (not self.walls[nextx][nexty]) and (not self.walls[nextx][nexty]):
             nextState = (nextx, nexty)
-            return self.state_food(nextState)
+            return self.state_food(nextState, eats)
         else:
             warnings.warn("Warning: checking the result of an invalid state, action pair.")
             return state
@@ -371,8 +369,11 @@ class CornersProblem(search.SearchProblem):
             return 1
         return 0
 
-    def state_food(self,state):
-        retorno = (state , self.food)
+    def state_food(self,state, eats):
+        if state in self.corners and state not in eats:
+            eats += state,
+
+        retorno = (state , eats)
         return retorno
 
     def getCostOfActions(self, actions):
