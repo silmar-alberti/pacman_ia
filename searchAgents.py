@@ -416,15 +416,13 @@ def cornersHeuristic(state, problem):
         xy1 = objetivo
         if objetivo not in eats:
             # result =((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
-            result = (abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])) #*(len(corners)-len(eats))
+            result = (abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])) #(len(corners)-len(eats))
+            # result = abs(9-xy1[0])
+
             # if result < heuristc:
             heuristc += result
             cont += 1
 
-
-
-
-    "*** YOUR CODE HERE ***"
     return heuristc / cont  # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
@@ -546,9 +544,31 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
+    xy2, foodGrid = state
+
+    heuristc = 0
+    corners = foodGrid.asList()
+    xy2, eats = state
+    cont =1
+    # print str(corners)
+    # if len(eats)== len(corners):
+    #     return 0
+    #
+    for objetivo in corners:
+        xy1 = objetivo
+        if objetivo not in eats:
+            result =((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
+            # result = (abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]))# *(len(corners))
+            # result = abs(9-xy1[0])
+
+            # if result < heuristc:
+            heuristc += result
+            cont += 1
+
+
+
     "*** YOUR CODE HERE ***"
-    return 0
+    return heuristc/cont
 
 def mazeDistance(point1, point2, gameState):
     """
