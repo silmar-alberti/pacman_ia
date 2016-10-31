@@ -558,10 +558,6 @@ def foodHeuristic(state, problem):
         xy1 = objetivo
         if objetivo not in eats:
             result =((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
-            # result = (abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]))# *(len(corners))
-            # result = abs(9-xy1[0])
-
-            # if result < heuristc:
             heuristc += result
             cont += 1
 
