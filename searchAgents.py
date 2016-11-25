@@ -407,7 +407,7 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
     heuristc = 0
     xy2, eats = state
-    cont =0
+    cont = 0
 
     if len(eats)== len(corners):
         return 0
@@ -549,11 +549,8 @@ def foodHeuristic(state, problem):
     heuristc = 0
     corners = foodGrid.asList()
     xy2, eats = state
-    cont =1
-    # print str(corners)
-    # if len(eats)== len(corners):
-    #     return 0
-    #
+    cont = 0
+
     for objetivo in corners:
         xy1 = objetivo
         if objetivo not in eats:
@@ -562,9 +559,10 @@ def foodHeuristic(state, problem):
             cont += 1
 
 
-
-    "*** YOUR CODE HERE ***"
-    return heuristc/cont
+    if cont > 0:
+        return heuristc/cont
+    else:
+        return heuristc
 
 def mazeDistance(point1, point2, gameState):
     """
