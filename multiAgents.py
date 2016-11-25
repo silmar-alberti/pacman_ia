@@ -69,14 +69,58 @@ class ReflexAgent(Agent):
         # Useful information you can extract from a GameState (pacman.py)
 
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+
+        self.ghostEvaluation(successorGameState)
+
+        if successorGameState.isWin():
+            return float("inf")
+
+
+        distfromghost = self.ghostEvaluation(successorGameState)
+
+        score = successorGameState.getScore() + max(distfromghost,0)
+
+        distFood = self.getFoodDist(successorGameState)
+
+        if action == Directions.STOP:
+            score -= 1
+        score -= 3* distFood
+
+        if (currentGameState.getNumFood() > successorGameState.getNumFood()):
+            score += 100
+
+        capsuleplaces = currentGameState.getCapsules()
+        if successorGameState.getPacmanPosition() in capsuleplaces:
+            score += 120
+
+        return score
+
+    def getFoodDist(self,gameState):
+        newFood = gameState.getFood()
+        newPos = gameState.getPacmanPosition()
+        foodlist = newFood.asList()
+        closestfood = 1000
+        for foodpos in foodlist:
+            thisdist = util.manhattanDistance(foodpos, newPos)
+            if (thisdist < closestfood):
+                closestfood = thisdist
+
+        return thisdist
+
+    def ghostEvaluation(self, state):
+        ghostsArray = state.getGhostStates()
+        pos = state.getPacmanPosition()
+        minDist = float('inf')
+        for ghost in ghostsArray:
+            ghostposition = ghost.getPosition()
+            distfromghost = util.manhattanDistance(ghostposition, pos)
+            if(distfromghost < minDist):
+                minDist = distfromghost
+
+        return minDist
+
 
 def scoreEvaluationFunction(currentGameState):
     """
