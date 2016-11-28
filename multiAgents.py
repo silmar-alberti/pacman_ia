@@ -15,6 +15,7 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
+import sys
 
 from game import Agent
 
@@ -161,21 +162,58 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
           Returns the minimax action from the current gameState using self.depth
           and self.evaluationFunction.
-
           Here are some method calls that might be useful when implementing minimax.
-
           gameState.getLegalActions(agentIndex):
             Returns a list of legal actions for an agent
             agentIndex=0 means Pacman, ghosts are >= 1
-
           gameState.generateSuccessor(agentIndex, action):
             Returns the successor game state after an agent takes an action
-
           gameState.getNumAgents():
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        a =  self.maxplayer(gameState, 0)
+        return a[1]
+
+    def maxplayer(self, gameState, depth):
+        if depth == self.depth:
+            return (self.evaluationFunction(gameState), None)
+
+        actionList = gameState.getLegalActions(0)
+        bestScore = -sys.maxint
+        bestAction = None
+
+        if len(actionList) == 0:
+            return (self.evaluationFunction(gameState), None)
+
+        for action in actionList:
+            newState = gameState.generateSuccessor(0, action)
+            newScore = self.minplayer(newState, 1, depth)[0]
+            if (newScore > bestScore):
+                bestScore, bestAction = newScore, action
+        return (bestScore, bestAction)
+
+    def minplayer(self, gameState, ID, depth):
+        actionList = gameState.getLegalActions(ID)
+        bestScore = sys.maxint
+        bestAction = None
+
+        if len(actionList) == 0:
+            return (self.evaluationFunction(gameState), None)
+
+        for action in actionList:
+            newState = gameState.generateSuccessor(ID, action)
+            a = gameState.getNumAgents()
+            if (ID == gameState.getNumAgents() - 1):
+                newScore = self.maxplayer(newState, depth + 1)[0]
+            else:
+                newScore = self.minplayer(newState, ID + 1, depth)[0]
+
+            if (newScore < bestScore):
+                bestScore, bestAction = newScore, action
+        return (bestScore, bestAction)
+
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
