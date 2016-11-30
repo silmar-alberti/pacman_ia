@@ -81,20 +81,20 @@ class ReflexAgent(Agent):
 
         distfromghost = self.ghostEvaluation(successorGameState)
 
-        score = successorGameState.getScore() + max(distfromghost,0)
+        score = successorGameState.getScore() + distfromghost
 
         distFood = self.getFoodDist(successorGameState)
 
         if action == Directions.STOP:
             score -= 1
-        score -= 3* distFood
+        score -= distFood*1.8
 
         if (currentGameState.getNumFood() > successorGameState.getNumFood()):
             score += 100
 
         capsuleplaces = currentGameState.getCapsules()
         if successorGameState.getPacmanPosition() in capsuleplaces:
-            score += 120
+            score += 300
 
         return score
 
@@ -113,7 +113,7 @@ class ReflexAgent(Agent):
     def ghostEvaluation(self, state):
         ghostsArray = state.getGhostStates()
         pos = state.getPacmanPosition()
-        minDist = float('inf')
+        minDist = sys.maxint
         for ghost in ghostsArray:
             ghostposition = ghost.getPosition()
             distfromghost = util.manhattanDistance(ghostposition, pos)
@@ -148,7 +148,7 @@ class MultiAgentSearchAgent(Agent):
       is another abstract class.
     """
 
-    def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
+    def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '100'):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -193,8 +193,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 bestScore, bestAction = newScore, action
         return (bestScore, bestAction)
 
-    def minplayer(self, gameState, ID, depth):
-        actionList = gameState.getLegalActions(ID)
+    def minplayer(self, gameState, agentIndex, depth):
+        actionList = gameState.getLegalActions(agentIndex)
         bestScore = sys.maxint
         bestAction = None
 
@@ -202,15 +202,15 @@ class MinimaxAgent(MultiAgentSearchAgent):
             return (self.evaluationFunction(gameState), None)
 
         for action in actionList:
-            newState = gameState.generateSuccessor(ID, action)
-            a = gameState.getNumAgents()
-            if (ID == gameState.getNumAgents() - 1):
+            newState = gameState.generateSuccessor(agentIndex, action)
+            if (agentIndex +1 == gameState.getNumAgents()):
                 newScore = self.maxplayer(newState, depth + 1)[0]
             else:
-                newScore = self.minplayer(newState, ID + 1, depth)[0]
+                newScore = self.minplayer(newState, agentIndex + 1, depth)[0]
 
             if (newScore < bestScore):
                 bestScore, bestAction = newScore, action
+
         return (bestScore, bestAction)
 
 
