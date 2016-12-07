@@ -314,24 +314,12 @@ def betterEvaluationFunction(currentGameState):
 
         return minDist
 
-    def sucessorsEvaluation(gameState):
-        pos = gameState.getPacmanPosition()
-        actions = gameState.getLegalPacmanActions()
-        score = -sys.maxint
-        for action in actions:
-            sucessorGameState = gameState.generatePacmanSuccessor(action)
-            scoreSucessor = sucessorGameState.getScore()
-            if(scoreSucessor > score):
-                score = scoreSucessor
-
-        return score
-
     if currentGameState.isWin():
-        return float("inf")
+        return sys.maxint
     if currentGameState.isLose():
-        return -float("inf")
+        return -sys.maxint -1
 
-    # distfromghost = ghostEvaluation(currentGameState)
+    distfromghost = ghostEvaluation(currentGameState)
 
     newFood = currentGameState.getFood()
     numFoods = len(newFood.asList())
@@ -339,9 +327,12 @@ def betterEvaluationFunction(currentGameState):
     score = currentGameState.getScore()
 
     distFood,nearFood,medFoodDist = getMinFoodDist(currentGameState)
-    sucessorScore = sucessorsEvaluation(currentGameState)
 
-    score =   score - medFoodDist - numFoods + sucessorScore
+    score =  -  (medFoodDist-1) +\
+             - numFoods \
+            + 0.2 * distfromghost\
+            + 1.5 * score\
+            + 0.5 * nearFood\
 
 
     return score
