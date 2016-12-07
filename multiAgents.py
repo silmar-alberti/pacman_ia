@@ -148,7 +148,7 @@ class MultiAgentSearchAgent(Agent):
       is another abstract class.
     """
 
-    def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '100'):
+    def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -188,30 +188,31 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         for action in actionList:
             newState = gameState.generateSuccessor(0, action)
-            newScore = self.minplayer(newState, 1, depth)[0]
+            newScore = self.minplayer(newState, 1, depth)
             if (newScore > bestScore):
                 bestScore, bestAction = newScore, action
+
         return (bestScore, bestAction)
 
     def minplayer(self, gameState, agentIndex, depth):
         actionList = gameState.getLegalActions(agentIndex)
         bestScore = sys.maxint
-        bestAction = None
+
 
         if len(actionList) == 0:
-            return (self.evaluationFunction(gameState), None)
+            return self.evaluationFunction(gameState)
 
         for action in actionList:
             newState = gameState.generateSuccessor(agentIndex, action)
             if (agentIndex +1 == gameState.getNumAgents()):
                 newScore = self.maxplayer(newState, depth + 1)[0]
             else:
-                newScore = self.minplayer(newState, agentIndex + 1, depth)[0]
+                newScore = self.minplayer(newState, agentIndex + 1, depth)
 
             if (newScore < bestScore):
-                bestScore, bestAction = newScore, action
+                bestScore= newScore
 
-        return (bestScore, bestAction)
+        return bestScore
 
 
 
@@ -224,26 +225,26 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
         def maxplayer(gameState, depth):
             if depth == self.depth:
-                return (self.evaluationFunction(gameState), None)
+                return (self.evaluationFunction(gameState),None)
 
             actionList = gameState.getLegalActions(0)
             bestScore = -sys.maxint
             bestAction = None
 
             if len(actionList) == 0:
-                return (self.evaluationFunction(gameState), None)
+                return (self.evaluationFunction(gameState),None)
 
             for action in actionList:
                 newState = gameState.generateSuccessor(0, action)
-                newScore = minplayer(newState, 1, depth)
+                newScore = medPlayer(newState, 1, depth)
                 if (newScore > bestScore):
-                    bestScore, bestAction = newScore, action
-            return (bestScore, bestAction)
+                    (bestScore , bestAction) = (newScore,action)
 
-        def minplayer( gameState, agentIndex, depth):
+            return (bestScore,bestAction)
+
+        def medPlayer( gameState, agentIndex, depth):
             actionList = gameState.getLegalActions(agentIndex)
             bestScore = 0
-            bestAction = None
 
             if len(actionList) == 0:
                 return self.evaluationFunction(gameState)
@@ -253,16 +254,14 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 if (agentIndex + 1 == gameState.getNumAgents()):
                     newScore = maxplayer(newState, depth + 1)[0]
                 else:
-                    newScore = minplayer(newState, agentIndex + 1, depth)
+                    newScore = medPlayer(newState, agentIndex + 1, depth)
 
-                # if (newScore < bestScore):
-                print newScore
                 bestScore = newScore + bestScore
 
             return bestScore / len(actionList)
 
-        a = maxplayer(gameState, 0)
-        return a[1]
+        a = maxplayer(gameState, 0)[1]
+        return a
 
 
 def betterEvaluationFunction(currentGameState):
@@ -273,7 +272,81 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+
+    def getMinFoodDist(gameState):
+        newFood = gameState.getFood()
+        newPos = gameState.getPacmanPosition()
+        foodlist = newFood.asList()
+        nearFoods = 0
+        medFoodDist = 0
+        closestfood = sys.maxint
+
+        for foodpos in foodlist:
+            thisdist = util.manhattanDistance(foodpos, newPos)
+            if (thisdist < closestfood):
+                closestfood = thisdist
+            if thisdist == 1:
+                nearFoods +=1
+            medFoodDist += thisdist
+
+        if len(foodlist) > 2:
+            medFoodDist = medFoodDist/ len(foodlist)
+        else:
+            medFoodDist = thisdist
+
+
+
+        return thisdist, nearFoods, medFoodDist
+
+
+
+    def ghostEvaluation(state):
+        ghostsArray = state.getGhostStates()
+        pos = state.getPacmanPosition()
+        minDist = sys.maxint
+
+        for ghost in ghostsArray:
+            ghostposition = ghost.getPosition()
+            distfromghost = util.manhattanDistance(ghostposition, pos)
+            if (distfromghost < minDist):
+                minDist = distfromghost
+
+        return minDist
+
+    def sucessorsEvaluation(gameState):
+        pos = gameState.getPacmanPosition()
+        actions = gameState.getLegalPacmanActions()
+        score = -sys.maxint
+        for action in actions:
+            sucessorGameState = gameState.generatePacmanSuccessor(action)
+            scoreSucessor = sucessorGameState.getScore()
+            if(scoreSucessor > score):
+                score = scoreSucessor
+
+        return score
+
+    if currentGameState.isWin():
+        return float("inf")
+    if currentGameState.isLose():
+        return -float("inf")
+
+    # distfromghost = ghostEvaluation(currentGameState)
+
+    newFood = currentGameState.getFood()
+    numFoods = len(newFood.asList())
+
+    score = currentGameState.getScore()
+
+    distFood,nearFood,medFoodDist = getMinFoodDist(currentGameState)
+    sucessorScore = sucessorsEvaluation(currentGameState)
+
+    score =   score - medFoodDist - numFoods + sucessorScore
+
+
+    return score
+
+
 
 # Abbreviation
 better = betterEvaluationFunction
